@@ -1,0 +1,28 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t pipaliyaatul/react-fib-calculator -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run pipaliyaatul/react-fib-calculator npm test -- --coverage 
+
+after_success:
+  - docker build -t pipaliyaatul/multi-client ./client
+  - docker build -t pipaliyaatul/multi-nginx ./nginx
+  - docker build -t pipaliyaatul/multi-server ./server
+  - docker build -t pipaliyaatul/multi-worker ./worker
+
+#login to docker 
+
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+  - docker push pipaliyaatul/multi-client
+  - docker push pipaliyaatul/multi-nginx
+  - docker push pipaliyaatul/multi-server
+  - docker push pipaliyaatul/multi-worker
+
+
+
+
